@@ -63,7 +63,7 @@ void InterruptDelay(int milliseconds);
 int main()
 {
         uint8_t lockout, value1, value2, value3;
-        int P1Lockout, P2Lockout, P3Lockout = 0;
+        int P1Lockout, P2Lockout, P3Lockout;
 
         if(!bcm2835_init())
                 return 1;
