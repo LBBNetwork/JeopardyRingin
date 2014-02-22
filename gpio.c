@@ -19,7 +19,7 @@
    * Ensure you have gcc and the bcm2835 library installed.
      To compile, simply issue this command:
 
-     gcc -o gpio_c gpio.c -l bcm2835
+     make
 
    Running:
    * Since this program uses GPIO pins, you must run the
@@ -35,7 +35,7 @@
 
    The following source code is (C) 2014 The Little Beige Box
    and is released as open-source software under the terms
-   contained in LICENSE.TXT. In the event you did not
+   contained in LICENSE.txt. In the event you did not
    recieve a copy of the license, please contact the email
    address below for a free digital copy.
 
@@ -57,19 +57,19 @@
 #define OPERATOR_INTERRUPT RPI_V2_GPIO_P1_05    //Pin SCL (GPIO 3, Rev2)
 /*#define OPERATOR_INTERRUPT RPI_GPIO_P1_05*/   //Pin SCL? (GPIO 1, Rev1)
 
-int GetPlayerRingin(int PlayerInput);
+int GetPlayerRingin(int PlayerInput, RPiGPIOPin playerLED);
 void InterruptDelay(int milliseconds);
 
 int main()
 {
         uint8_t lockout, value1, value2, value3;
-        int P1Lockout, P2Lockout, P3Lockout = 0;
+        int P1Lockout, P2Lockout, P3Lockout;
 
         if(!bcm2835_init())
                 return 1;
 
         /* Set up the GPIO pins for input */
-		bcm2835_gpio_fsel(INPUT1, BCM2835_GPIO_FSEL_INPT);
+        bcm2835_gpio_fsel(INPUT1, BCM2835_GPIO_FSEL_INPT);
         bcm2835_gpio_set_pud(INPUT1, BCM2835_GPIO_PUD_UP);
 
         bcm2835_gpio_fsel(INPUT2, BCM2835_GPIO_FSEL_INPT);
@@ -119,7 +119,7 @@ int main()
                         {
                                 if(P1Lockout == 0)
                                 {
-                                        P1Lockout = GetPlayerRingin(1);
+                                        P1Lockout = GetPlayerRingin(1, P1_LED);
                                 }
                                 else
                                 {
@@ -131,7 +131,7 @@ int main()
                         {
                                 if(P2Lockout == 0)
                                 {
-                                        P2Lockout = GetPlayerRingin(2);
+                                        P2Lockout = GetPlayerRingin(2, P2_LED);
                                 }
                                 else
                                 {
@@ -143,7 +143,7 @@ int main()
                         {
                                 if(P3Lockout == 0)
                                 {
-                                        P3Lockout = GetPlayerRingin(3);
+                                        P3Lockout = GetPlayerRingin(3, P3_LED);
                                 }
                                 else
                                 {
@@ -157,37 +157,16 @@ int main()
         return 0;
 }
 
-int GetPlayerRingin(int PlayerInput)
+int GetPlayerRingin(int PlayerInput, RPiGPIOPin playerLED)
 {
-        /* Each if statement will cause this function to return
-           1. That value is stored in the lockout ints so we can
-           lock a player out until the Enabler is turned on again */
-        if(PlayerInput == 1)
-        {
-                printf("Player %d rung in\n", PlayerInput);
-                bcm2835_gpio_write(P1_LED, HIGH);
-                InterruptDelay(5000);
-                bcm2835_gpio_write(P1_LED, LOW);
-                return 1;
-        }
-        else if(PlayerInput == 2)
-        {
-                printf("Player %d rung in\n", PlayerInput);
-                bcm2835_gpio_write(P2_LED, HIGH);
-                InterruptDelay(5000);
-                bcm2835_gpio_write(P2_LED, LOW);
-                return 1;
-        }
-        else if(PlayerInput == 3)
-        {
-                printf("Player %d rung in\n", PlayerInput);
-                bcm2835_gpio_write(P3_LED, HIGH);
-                InterruptDelay(5000);
-                bcm2835_gpio_write(P3_LED, LOW);
-                return 1;
-        }
-
-        return 0;
+        /* Return value of 1 is stored in the lockout ints in main()
+           so we can lock a player out until the Enabler is turned on
+           again */
+	printf("Player %d rung in\n", PlayerInput);
+	bcm2835_gpio_write(playerLED, HIGH);
+	InterruptDelay(5000);
+	bcm2835_gpio_write(playerLED, LOW);
+	return 1;
 }
 
 void InterruptDelay(int milliseconds)
@@ -200,7 +179,7 @@ void InterruptDelay(int milliseconds)
 
         for(IDelay = 0; IDelay < milliseconds; IDelay = IDelay + 1)
         {
-                delay(1);
+                bcm2835_delay(1);
                 oi = bcm2835_gpio_lev(OPERATOR_INTERRUPT);
 
                 if(oi == 0)
