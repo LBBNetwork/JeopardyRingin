@@ -213,3 +213,9 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+
+# Object code.
+*.o
+
+# Specific to this project.
+jeopardy-ringin
