@@ -69,7 +69,7 @@ int main()
                 return 1;
 
         /* Set up the GPIO pins for input */
-		bcm2835_gpio_fsel(INPUT1, BCM2835_GPIO_FSEL_INPT);
+        bcm2835_gpio_fsel(INPUT1, BCM2835_GPIO_FSEL_INPT);
         bcm2835_gpio_set_pud(INPUT1, BCM2835_GPIO_PUD_UP);
 
         bcm2835_gpio_fsel(INPUT2, BCM2835_GPIO_FSEL_INPT);
