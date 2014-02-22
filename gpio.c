@@ -35,7 +35,7 @@
 
    The following source code is (C) 2014 The Little Beige Box
    and is released as open-source software under the terms
-   contained in LICENSE.TXT. In the event you did not
+   contained in LICENSE.txt. In the event you did not
    recieve a copy of the license, please contact the email
    address below for a free digital copy.
 
