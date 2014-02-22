@@ -57,7 +57,7 @@
 #define OPERATOR_INTERRUPT RPI_V2_GPIO_P1_05    //Pin SCL (GPIO 3, Rev2)
 /*#define OPERATOR_INTERRUPT RPI_GPIO_P1_05*/   //Pin SCL? (GPIO 1, Rev1)
 
-int GetPlayerRingin(int PlayerInput);
+int GetPlayerRingin(int PlayerInput, RPiGPIOPin playerLED);
 void InterruptDelay(int milliseconds);
 
 int main()
@@ -119,7 +119,7 @@ int main()
                         {
                                 if(P1Lockout == 0)
                                 {
-                                        P1Lockout = GetPlayerRingin(1);
+                                        P1Lockout = GetPlayerRingin(1, P1_LED);
                                 }
                                 else
                                 {
@@ -131,7 +131,7 @@ int main()
                         {
                                 if(P2Lockout == 0)
                                 {
-                                        P2Lockout = GetPlayerRingin(2);
+                                        P2Lockout = GetPlayerRingin(2, P2_LED);
                                 }
                                 else
                                 {
@@ -143,7 +143,7 @@ int main()
                         {
                                 if(P3Lockout == 0)
                                 {
-                                        P3Lockout = GetPlayerRingin(3);
+                                        P3Lockout = GetPlayerRingin(3, P3_LED);
                                 }
                                 else
                                 {
@@ -157,37 +157,16 @@ int main()
         return 0;
 }
 
-int GetPlayerRingin(int PlayerInput)
+int GetPlayerRingin(int PlayerInput, RPiGPIOPin playerLED)
 {
-        /* Each if statement will cause this function to return
-           1. That value is stored in the lockout ints so we can
-           lock a player out until the Enabler is turned on again */
-        if(PlayerInput == 1)
-        {
-                printf("Player %d rung in\n", PlayerInput);
-                bcm2835_gpio_write(P1_LED, HIGH);
-                InterruptDelay(5000);
-                bcm2835_gpio_write(P1_LED, LOW);
-                return 1;
-        }
-        else if(PlayerInput == 2)
-        {
-                printf("Player %d rung in\n", PlayerInput);
-                bcm2835_gpio_write(P2_LED, HIGH);
-                InterruptDelay(5000);
-                bcm2835_gpio_write(P2_LED, LOW);
-                return 1;
-        }
-        else if(PlayerInput == 3)
-        {
-                printf("Player %d rung in\n", PlayerInput);
-                bcm2835_gpio_write(P3_LED, HIGH);
-                InterruptDelay(5000);
-                bcm2835_gpio_write(P3_LED, LOW);
-                return 1;
-        }
-
-        return 0;
+        /* Return value of 1 is stored in the lockout ints in main()
+           so we can lock a player out until the Enabler is turned on
+           again */
+	printf("Player %d rung in\n", PlayerInput);
+	bcm2835_gpio_write(playerLED, HIGH);
+	InterruptDelay(5000);
+	bcm2835_gpio_write(playerLED, LOW);
+	return 1;
 }
 
 void InterruptDelay(int milliseconds)
@@ -200,7 +179,7 @@ void InterruptDelay(int milliseconds)
 
         for(IDelay = 0; IDelay < milliseconds; IDelay = IDelay + 1)
         {
-                delay(1);
+                bcm2835_delay(1);
                 oi = bcm2835_gpio_lev(OPERATOR_INTERRUPT);
 
                 if(oi == 0)
