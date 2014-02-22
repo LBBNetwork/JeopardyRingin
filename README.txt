@@ -22,7 +22,7 @@ Compiling:
 * Ensure you have gcc and the bcm2835 library installed.
   To compile, simply issue this command:
 
-  gcc -o gpio_c gpio.c -l bcm2835
+  make
 
 Running:
 * Since this program uses GPIO pins, you must run the
